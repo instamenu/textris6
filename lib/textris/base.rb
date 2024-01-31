@@ -55,7 +55,7 @@ module Textris
 
     protected
 
-    def text(options = {})
+    def text(options)
       @locale = options[:locale] || I18n.locale
 
       options = self.class.with_defaults(options)
