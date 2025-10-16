@@ -1,4 +1,4 @@
-module Textris
+   module Textris
   class Message
     attr_reader :content, :from_name, :from_phone, :to, :texter, :action, :args,
       :media_urls, :twilio_messaging_service_sid
@@ -22,6 +22,30 @@ module Textris
 
       self
     end
+
+    # Compatibility helpers so MessageDelivery can call these
+    def deliver_now(*_opts)
+      deliver
+    end
+
+    def deliver_later(*_opts)
+      # If an ActiveJob/async backend is wired in, integrate here.
+      # For now, raise a clear error to match ActionMailer-style behavior.
+      if defined?(Textris::Delay::ActiveJob::Job)
+        options = _opts.first.is_a?(Hash) ? _opts.first : {}
+        job = Textris::Delay::ActiveJob::Job
+        # Use raw texter constant name and action/args, same as the adapter expects
+        job.new(texter(raw: true).to_s, action.to_s, args || []).enqueue(options)
+      else
+        raise(LoadError, "ActiveJob/Delay backend not available to deliver later")
+      end
+    end
+
+    # Return the built message for delegator .call or .call_action usage
+    def call
+      self
+    end
+    alias call_action call
 
     def texter(options = {})
       if options[:raw]

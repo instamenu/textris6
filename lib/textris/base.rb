@@ -23,8 +23,9 @@ module Textris
 
       private
 
+      # Replace immediate message building with a MessageDelivery delegator
       def method_missing(method_name, *args)
-        new(method_name, *args).call_action
+        ::Textris::MessageDelivery.new(self, method_name, *args)
       end
 
       def respond_to_missing?(method, *args)

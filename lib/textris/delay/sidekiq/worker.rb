@@ -10,7 +10,8 @@ module Textris
           if texter.present?
             args = ::Textris::Delay::Sidekiq::Serializer.deserialize(args)
 
-            texter.new(action, *args).call_action.deliver
+            # Build the delegator with the texter constant and action
+            ::Textris::MessageDelivery.new(texter, action, *args).deliver_now
           end
         end
       end

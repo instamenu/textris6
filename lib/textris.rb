@@ -24,6 +24,7 @@ end
 require 'textris/base'
 require 'textris/phone_formatter'
 require 'textris/message'
+require 'textris/message_delivery'
 
 begin
   require 'active_job'
